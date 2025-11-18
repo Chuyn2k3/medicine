@@ -55,7 +55,7 @@ class _PrescriptionListItemState extends State<PrescriptionListItem> {
                       : AppColors.primaryLight,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: Icon(
+                child: const Icon(
                   Icons.receipt,
                   color: AppColors.primary,
                   size: 24,
@@ -67,7 +67,7 @@ class _PrescriptionListItemState extends State<PrescriptionListItem> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.prescription.name,
+                      widget.prescription.name ?? "-",
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.w700,
                             color: AppColors.black,
@@ -78,14 +78,15 @@ class _PrescriptionListItemState extends State<PrescriptionListItem> {
                     const SizedBox(height: 6),
                     Row(
                       children: [
-                        Icon(Icons.person, size: 14, color: AppColors.grey400),
+                        const Icon(Icons.person,
+                            size: 14, color: AppColors.grey400),
                         const SizedBox(width: 4),
                         Expanded(
                           child: Text(
                             'BS. ${widget.prescription.doctor}',
                             style:
                                 Theme.of(context).textTheme.bodySmall?.copyWith(
-                                      color: AppColors.grey100,
+                                      color: AppColors.grey500,
                                     ),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
@@ -95,7 +96,7 @@ class _PrescriptionListItemState extends State<PrescriptionListItem> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${widget.prescription.medicines.length} loại thuốc',
+                      '${widget.prescription.medicines?.length} loại thuốc',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
                             color: AppColors.secondary,
                             fontWeight: FontWeight.w600,

@@ -7,17 +7,12 @@ abstract class ScheduleState extends Equatable {
   List<Object?> get props => [];
 }
 
-class ScheduleInitial extends ScheduleState {
-  const ScheduleInitial();
-}
+class ScheduleInitial extends ScheduleState {}
 
-class ScheduleLoading extends ScheduleState {
-  const ScheduleLoading();
-}
+class ScheduleLoading extends ScheduleState {}
 
 class ScheduleListLoaded extends ScheduleState {
-  final List<ScheduleModel> schedules;
-
+  final List<PrescriptionModel> schedules;
   const ScheduleListLoaded(this.schedules);
 
   @override
@@ -25,8 +20,7 @@ class ScheduleListLoaded extends ScheduleState {
 }
 
 class ScheduleCreated extends ScheduleState {
-  final ScheduleModel schedule;
-
+  final PrescriptionModel schedule;
   const ScheduleCreated(this.schedule);
 
   @override
@@ -34,21 +28,17 @@ class ScheduleCreated extends ScheduleState {
 }
 
 class ScheduleUpdated extends ScheduleState {
-  final ScheduleModel schedule;
-
+  final PrescriptionModel schedule;
   const ScheduleUpdated(this.schedule);
 
   @override
   List<Object?> get props => [schedule];
 }
 
-class ScheduleDeleted extends ScheduleState {
-  const ScheduleDeleted();
-}
+class ScheduleDeleted extends ScheduleState {}
 
 class ScheduleError extends ScheduleState {
   final String message;
-
   const ScheduleError(this.message);
 
   @override

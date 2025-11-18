@@ -2,12 +2,12 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:dio/dio.dart';
 import 'package:medical_drug/services/token_manager.dart';
+import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import '../../core/constants/app_constants.dart';
 import '../models/base_response_model.dart';
 import '../models/chat_message_model.dart';
 import '../models/medicine_model.dart';
 import '../models/prescription_model.dart';
-import '../models/schedule_model.dart';
 
 class ApiClient {
   late Dio _dio;
@@ -24,7 +24,17 @@ class ApiClient {
         contentType: Headers.jsonContentType,
       ),
     );
-
+    _dio.interceptors.add(
+      PrettyDioLogger(
+        requestHeader: true,
+        requestBody: true,
+        responseHeader: true,
+        responseBody: true,
+        error: true,
+        compact: false,
+        maxWidth: 200,
+      ),
+    );
     _dio.interceptors.add(
       InterceptorsWrapper(
         onRequest: (options, handler) async {
@@ -32,115 +42,19 @@ class ApiClient {
           if (token != null && token.isNotEmpty) {
             options.headers['Authorization'] = 'Bearer $token';
           }
-          _logRequest(options);
+          // _logRequest(options);
           return handler.next(options);
         },
         onResponse: (response, handler) {
-          _logResponse(response);
+          // _logResponse(response);
           return handler.next(response);
         },
         onError: (error, handler) {
-          _logError(error);
+          // _logError(error);
           return handler.next(error);
         },
       ),
     );
-  }
-
-  // ------------------- Logging -------------------
-  void _logRequest(RequestOptions options) {
-    developer.log(
-      '''
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🔵 API REQUEST
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Method: ${options.method}
-Path: ${options.path}
-Full URL: ${options.uri}
-
-Headers:
-${_formatHeaders(options.headers)}
-
-Query Parameters:
-${options.queryParameters.isEmpty ? 'None' : _formatMap(options.queryParameters)}
-
-Body/Data:
-${options.data is FormData ? 'FormData' : _formatJson(options.data)}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-''',
-      name: 'ApiClient',
-      level: 800,
-    );
-  }
-
-  void _logResponse(Response response) {
-    developer.log(
-      '''
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🟢 API RESPONSE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Status Code: ${response.statusCode}
-Path: ${response.requestOptions.path}
-
-Response Headers:
-${_formatHeaders(response.headers.map)}
-
-Response Body:
-${_formatJson(response.data)}
-
-Time: ${DateTime.now()}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-''',
-      name: 'ApiClient',
-      level: 800,
-    );
-  }
-
-  void _logError(DioException error) {
-    developer.log(
-      '''
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-🔴 API ERROR
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Error Type: ${error.type}
-Status Code: ${error.response?.statusCode ?? 'N/A'}
-Path: ${error.requestOptions.path}
-Message: ${error.message}
-
-Error Details:
-${error.error}
-
-Response:
-${_formatJson(error.response?.data)}
-
-Time: ${DateTime.now()}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-''',
-      name: 'ApiClient',
-      level: 1000,
-    );
-  }
-
-  String _formatHeaders(Map<String, dynamic> headers) {
-    if (headers.isEmpty) return 'None';
-    return headers.entries.map((e) => '  ${e.key}: ${e.value}').join('\n');
-  }
-
-  String _formatMap(Map<String, dynamic> map) {
-    return map.entries.map((e) => '  ${e.key}: ${e.value}').join('\n');
-  }
-
-  String _formatJson(dynamic data) {
-    if (data == null) return 'null';
-    if (data is String) return data;
-    if (data is Map || data is List) {
-      try {
-        return const JsonEncoder.withIndent('  ').convert(data);
-      } catch (_) {
-        return data.toString();
-      }
-    }
-    return data.toString();
   }
 
   // ------------------- User APIs -------------------
@@ -203,15 +117,11 @@ Time: ${DateTime.now()}
     );
   }
 
-  Future<BaseResponse<PaginatedResponse<MedicineModel>>> searchMedicineByName(
-      String name) async {
+  Future<BaseResponse<MedicineModel>> searchMedicineByName(String name) async {
     final response = await _dio.get('/medicines/by-name/$name');
     return BaseResponse.fromJson(
       response.data,
-      (json) => PaginatedResponse<MedicineModel>.fromJson(
-        json as Map<String, dynamic>,
-        (item) => MedicineModel.fromJson(item as Map<String, dynamic>),
-      ),
+      (json) => MedicineModel.fromJson(json as Map<String, dynamic>),
     );
   }
 
@@ -236,28 +146,42 @@ Time: ${DateTime.now()}
   }
 
   // ------------------- Schedule APIs -------------------
-  Future<BaseResponse<List<ScheduleModel>>> getScheduleList() async {
-    final response = await _dio.get('/schedules');
+  /// Lấy danh sách lịch uống theo user
+  Future<BaseResponse<List<PrescriptionModel>>> getScheduleList() async {
+    final response = await _dio.get('/prescriptions'); // API trả prescription
     return BaseResponse.fromJson(
       response.data,
       (json) => (json as List)
-          .map((item) => ScheduleModel.fromJson(item as Map<String, dynamic>))
+          .map((item) =>
+              PrescriptionModel.fromJson(item as Map<String, dynamic>))
           .toList(),
     );
   }
 
-  Future<BaseResponse<ScheduleModel>> createSchedule(
-      ScheduleModel schedule) async {
-    final response = await _dio.post('/schedules', data: schedule.toJson());
+  /// Tạo lịch mới
+  Future<BaseResponse<PrescriptionModel>> createSchedule(
+      PrescriptionModel schedule) async {
+    final response = await _dio.post('/prescriptions', data: schedule.toJson());
     return BaseResponse.fromJson(
       response.data,
-      (json) => ScheduleModel.fromJson(json as Map<String, dynamic>),
+      (json) => PrescriptionModel.fromJson(json as Map<String, dynamic>),
     );
   }
 
+  /// Cập nhật lịch
+  Future<BaseResponse<PrescriptionModel>> updateSchedule(
+      String id, Map<String, dynamic> body) async {
+    final response = await _dio.patch('/prescriptions/$id', data: body);
+    return BaseResponse.fromJson(
+      response.data,
+      (json) => PrescriptionModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  /// Xoá lịch
   Future<BaseResponse<void>> deleteSchedule(String id) async {
-    final response = await _dio.delete('/schedules/$id');
-    return BaseResponse.fromJson(response.data, (_) => null);
+    final response = await _dio.delete('/prescriptions/$id');
+    return BaseResponse.fromJson(response.data, (_) {});
   }
 
   // ------------------- Chat APIs -------------------

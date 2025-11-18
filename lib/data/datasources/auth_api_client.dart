@@ -17,55 +17,59 @@ class AuthApiClient {
         contentType: Headers.jsonContentType,
       ),
     );
-    _dio.interceptors.add(
-      PrettyDioLogger(
-        requestHeader: true,
-        requestBody: true,
-        responseHeader: true,
-        responseBody: true,
-        error: true,
-        compact: false,
-        maxWidth: 200,
-      ),
-    );
+    _dio.interceptors.add(PrettyDioLogger(
+      requestHeader: true,
+      requestBody: true,
+      responseHeader: true,
+      responseBody: true,
+      error: true,
+      compact: false,
+      maxWidth: 200,
+    ));
   }
 
   Future<LoginResponse> login(String phone, String password) async {
     try {
-      final response = await _dio.post(
-        '/auth/login',
-        data: {
-          'phone': phone,
-          'password': password,
-        },
-      );
+      final response = await _dio.post('/auth/login', data: {
+        'phone': phone,
+        'password': password,
+      });
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data['data'] as Map<String, dynamic>;
         return LoginResponse.fromJson(data);
+      } else if (response.statusCode == 401) {
+        throw AuthException("Số điện thoại hoặc mật khẩu không chính xác");
       }
-      throw Exception('Login failed');
-    } catch (e) {
+      throw AuthException("Login thất bại");
+    } on DioError catch (e) {
+      if (e.response != null) {
+        final msg = e.response?.data['message'] ?? "Lỗi server";
+        throw AuthException(msg);
+      }
       rethrow;
     }
   }
 
   Future<UserModel> register(String phone, String password) async {
     try {
-      final response = await _dio.post(
-        '/auth/register',
-        data: {
-          'phone': phone,
-          'password': password,
-        },
-      );
+      final response = await _dio.post('/auth/register', data: {
+        'phone': phone,
+        'password': password,
+      });
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data['data'] as Map<String, dynamic>;
         return UserModel.fromJson(data);
+      } else if (response.statusCode == 409) {
+        throw AuthException("Số điện thoại đã được đăng ký");
       }
-      throw Exception('Registration failed');
-    } catch (e) {
+      throw AuthException("Đăng ký thất bại");
+    } on DioError catch (e) {
+      if (e.response != null) {
+        final msg = e.response?.data['message'] ?? "Lỗi server";
+        throw AuthException(msg);
+      }
       rethrow;
     }
   }
@@ -79,9 +83,14 @@ class AuthApiClient {
         final data = response.data['data'] as Map<String, dynamic>;
         return UserModel.fromJson(data);
       }
-      throw Exception('Failed to fetch user');
-    } catch (e) {
-      rethrow;
+      throw AuthException("Không lấy được thông tin người dùng");
+    } on DioError catch (e) {
+      throw AuthException("Không lấy được thông tin người dùng: ${e.message}");
     }
   }
+}
+
+class AuthException implements Exception {
+  final String message;
+  AuthException(this.message);
 }

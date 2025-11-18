@@ -13,7 +13,7 @@ class PrescriptionCubit extends Cubit<PrescriptionState> {
   List<PrescriptionModel> _allPrescriptions = [];
   bool _hasMorePages = true;
 
-  PrescriptionCubit(this._repository) : super(PrescriptionInitial());
+  PrescriptionCubit(this._repository) : super(const PrescriptionInitial());
 
   Future<void> getPrescriptionList({bool isRefresh = false}) async {
     try {
@@ -21,7 +21,7 @@ class PrescriptionCubit extends Cubit<PrescriptionState> {
         _currentPage = 1;
         _allPrescriptions = [];
         _hasMorePages = true;
-        emit(PrescriptionLoading());
+        emit(const PrescriptionLoading());
       } else if (!_hasMorePages) {
         return;
       }
@@ -42,20 +42,6 @@ class PrescriptionCubit extends Cubit<PrescriptionState> {
           _allPrescriptions,
           hasMorePages: _hasMorePages,
         ));
-      }
-    } catch (e) {
-      emit(PrescriptionError(e.toString()));
-    }
-  }
-
-  Future<void> getPrescriptionById(String id) async {
-    try {
-      emit(const PrescriptionLoading());
-      final prescription = await _repository.getPrescriptionById(id);
-      if (prescription != null) {
-        emit(PrescriptionDetailLoaded(prescription));
-      } else {
-        emit(const PrescriptionError('Đơn thuốc không tìm thấy'));
       }
     } catch (e) {
       emit(PrescriptionError(e.toString()));

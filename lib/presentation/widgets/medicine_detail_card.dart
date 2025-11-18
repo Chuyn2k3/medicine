@@ -11,185 +11,38 @@ class MedicineDetailCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      elevation: 4,
+      elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [
-                      AppColors.secondary,
-                      AppColors.secondary.withOpacity(0.8)
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Tên thuốc
+            Text(
+              medicine.name ?? "-",
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: AppColors.primary,
                   ),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: AppColors.white.withOpacity(0.2),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: const Icon(Icons.medication_liquid,
-                          color: AppColors.white, size: 28),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Text(
-                        medicine.name ?? "-",
-                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                              color: AppColors.white,
-                              fontWeight: FontWeight.w700,
-                            ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: AppColors.grey50,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Column(
-                  children: [
-                    _buildInfoRow(
-                        'Liều dùng',
-                        medicine.quantity != null
-                            ? medicine.quantity.toString()
-                            : "-",
-                        context),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              _buildSectionHeader('Mô tả', Icons.description, context),
-              const SizedBox(height: 12),
-              Text(
-                medicine.description ?? "_",
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      height: 1.6,
-                      color: AppColors.grey700,
-                    ),
-              ),
-              const SizedBox(height: 20),
-              // _buildSectionHeader('Thành phần', Icons.science, context),
-              // const SizedBox(height: 12),
-              // Container(
-              //   padding: const EdgeInsets.all(12),
-              //   decoration: BoxDecoration(
-              //     color: AppColors.primaryLight,
-              //     borderRadius: BorderRadius.circular(8),
-              //   ),
-              //   child: Column(
-              //     crossAxisAlignment: CrossAxisAlignment.start,
-              //     children: medicine.ingredients.map((ingredient) {
-              //       return Padding(
-              //         padding: const EdgeInsets.only(bottom: 8),
-              //         child: Row(
-              //           children: [
-              //             Container(
-              //               width: 6,
-              //               height: 6,
-              //               decoration: BoxDecoration(
-              //                 color: AppColors.primary,
-              //                 shape: BoxShape.circle,
-              //               ),
-              //             ),
-              //             const SizedBox(width: 10),
-              //             Expanded(
-              //               child: Text(
-              //                 ingredient,
-              //                 style: Theme.of(context)
-              //                     .textTheme
-              //                     .bodySmall
-              //                     ?.copyWith(
-              //                       color: AppColors.grey700,
-              //                     ),
-              //               ),
-              //             ),
-              //           ],
-              //         ),
-              //       );
-              //     }).toList(),
-              //   ),
-              // ),
-              const SizedBox(height: 20),
-              _buildSectionHeader('Cách sử dụng', Icons.info, context),
-              const SizedBox(height: 12),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: AppColors.accentLight,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: AppColors.accent, width: 1),
-                ),
-                child: Text(
-                  medicine.dosage ?? "-",
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppColors.black,
-                        height: 1.6,
-                      ),
-                ),
-              ),
-              const SizedBox(height: 20),
-              // Container(
-              //   padding: const EdgeInsets.all(14),
-              //   decoration: BoxDecoration(
-              //     color: const Color(0xFFFEE2E2),
-              //     borderRadius: BorderRadius.circular(10),
-              //     border: Border.all(color: AppColors.error, width: 2),
-              //   ),
-              //   child: Column(
-              //     crossAxisAlignment: CrossAxisAlignment.start,
-              //     children: [
-              //       Row(
-              //         children: [
-              //           Container(
-              //             padding: const EdgeInsets.all(6),
-              //             decoration: BoxDecoration(
-              //               color: AppColors.error,
-              //               borderRadius: BorderRadius.circular(6),
-              //             ),
-              //             child: const Icon(Icons.warning,
-              //                 color: AppColors.white, size: 18),
-              //           ),
-              //           const SizedBox(width: 10),
-              //           Text(
-              //             'Tác dụng phụ có thể xảy ra',
-              //             style:
-              //                 Theme.of(context).textTheme.titleSmall?.copyWith(
-              //                       color: AppColors.error,
-              //                       fontWeight: FontWeight.w700,
-              //                     ),
-              //           ),
-              //         ],
-              //       ),
-              //       const SizedBox(height: 10),
-              //       Text(
-              //         medicine.sideEffects,
-              //         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              //               color: AppColors.black,
-              //               height: 1.6,
-              //             ),
-              //       ),
-              //     ],
-              //   ),
-              // ),
-            ],
-          ),
+            ),
+            const SizedBox(height: 12),
+
+            // Liều dùng
+            _buildInfoRow(
+              'Liều dùng',
+              medicine.quantity != null ? medicine.quantity.toString() : "-",
+              context,
+            ),
+            const SizedBox(height: 16),
+
+            // Mô tả
+            _buildSection('Mô tả', medicine.description ?? "-", context),
+            const SizedBox(height: 16),
+
+            // Cách sử dụng
+            _buildSection('Cách sử dụng', medicine.dosage ?? "-", context),
+          ],
         ),
       ),
     );
@@ -202,7 +55,7 @@ class MedicineDetailCard extends StatelessWidget {
         SizedBox(
           width: 100,
           child: Text(
-            label,
+            "$label:",
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: AppColors.grey700,
@@ -213,8 +66,8 @@ class MedicineDetailCard extends StatelessWidget {
           child: Text(
             value,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w500,
                   color: AppColors.black,
+                  fontWeight: FontWeight.w500,
                 ),
           ),
         ),
@@ -222,18 +75,32 @@ class MedicineDetailCard extends StatelessWidget {
     );
   }
 
-  Widget _buildSectionHeader(
-      String title, IconData icon, BuildContext context) {
-    return Row(
+  Widget _buildSection(String title, String content, BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Icon(icon, color: AppColors.primary, size: 20),
-        const SizedBox(width: 8),
         Text(
           title,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w700,
+          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                fontWeight: FontWeight.bold,
                 color: AppColors.black,
               ),
+        ),
+        const SizedBox(height: 6),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: AppColors.grey50,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            content,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                  color: AppColors.grey700,
+                  height: 1.5,
+                ),
+          ),
         ),
       ],
     );

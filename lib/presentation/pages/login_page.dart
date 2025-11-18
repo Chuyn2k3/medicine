@@ -25,18 +25,35 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _submitLogin() {
+    FocusScope.of(context).unfocus();
+
     final phone = _phoneController.text.trim();
     final password = _passwordController.text.trim();
 
-    if (phone.isEmpty || password.isEmpty) {
+    // Validate phone
+    final phoneRegex = RegExp(r'^0\d{9}$'); // chỉ nhận dạng: 0xxxxxxxxx
+
+    if (!phoneRegex.hasMatch(phone)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Vui lòng nhập số điện thoại và mật khẩu'),
+          content: Text(
+              'Số điện thoại không hợp lệ (phải gồm 10 số và bắt đầu bằng 0)'),
         ),
       );
       return;
     }
 
+    // Validate password
+    if (password.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Mật khẩu phải có ít nhất 6 ký tự'),
+        ),
+      );
+      return;
+    }
+
+    // Call login
     context.read<AuthCubit>().login(phone, password);
   }
 
@@ -59,23 +76,30 @@ class _LoginPageState extends State<LoginPage> {
         }
       },
       child: Scaffold(
-        body: Stack(
-          children: [
-            _buildLoginForm(context),
-            BlocBuilder<AuthCubit, AuthState>(
-              builder: (context, state) {
-                if (state is AuthLoading) {
-                  return Container(
-                    color: Colors.black38,
-                    child: const Center(
-                      child: CircularProgressIndicator(),
-                    ),
-                  );
-                }
-                return const SizedBox.shrink();
-              },
-            ),
-          ],
+        body: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            // Bỏ focus tất cả TextField khi chạm ngoài
+            FocusScope.of(context).unfocus();
+          },
+          child: Stack(
+            children: [
+              _buildLoginForm(context),
+              BlocBuilder<AuthCubit, AuthState>(
+                builder: (context, state) {
+                  if (state is AuthLoading) {
+                    return Container(
+                      color: Colors.black38,
+                      child: const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                  }
+                  return const SizedBox.shrink();
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -119,7 +143,7 @@ class _LoginPageState extends State<LoginPage> {
             controller: _phoneController,
             decoration: InputDecoration(
               labelText: 'Số điện thoại',
-              hintText: '+84123456789',
+              hintText: '0123456789',
               prefixIcon: const Icon(Icons.phone),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8),

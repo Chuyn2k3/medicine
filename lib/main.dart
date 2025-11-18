@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:medical_drug/presentation/cubits/auth_cubit.dart';
 import 'package:medical_drug/presentation/cubits/chat_cubit.dart';
 import 'package:medical_drug/presentation/cubits/medicine_cubit.dart';
+import 'package:medical_drug/presentation/cubits/medicine_detail_cubit.dart';
 import 'package:medical_drug/presentation/cubits/prescription_cubit.dart';
+import 'package:medical_drug/presentation/cubits/prescription_detail_cubit.dart';
 import 'package:medical_drug/presentation/cubits/schedule_cubit.dart';
 import 'package:medical_drug/presentation/pages/home_page.dart';
 import 'package:medical_drug/presentation/pages/login_page.dart';
@@ -29,6 +31,12 @@ class MedicineApp extends StatelessWidget {
         BlocProvider<MedicineCubit>(
           create: (context) => getIt<MedicineCubit>(),
         ),
+        BlocProvider<MedicineDetailCubit>(
+          create: (context) => getIt<MedicineDetailCubit>(),
+        ),
+        BlocProvider<PrescriptionDetailCubit>(
+          create: (context) => getIt<PrescriptionDetailCubit>(),
+        ),
         BlocProvider<PrescriptionCubit>(
           create: (context) => getIt<PrescriptionCubit>(),
         ),
@@ -44,6 +52,7 @@ class MedicineApp extends StatelessWidget {
         theme: AppTheme.lightTheme,
         home: const AuthWrapper(),
         debugShowCheckedModeBanner: false,
+        navigatorKey: navigatorKey,
       ),
     );
   }
@@ -74,3 +83,5 @@ class AuthWrapper extends StatelessWidget {
     );
   }
 }
+
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();

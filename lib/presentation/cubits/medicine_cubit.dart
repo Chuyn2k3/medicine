@@ -14,7 +14,7 @@ class MedicineCubit extends Cubit<MedicineState> {
   List<MedicineModel> _allMedicines = [];
   bool _hasMorePages = true;
 
-  MedicineCubit(this._repository) : super(MedicineInitial());
+  MedicineCubit(this._repository) : super(const MedicineInitial());
 
   Future<void> getMedicineList({bool isRefresh = false}) async {
     try {
@@ -22,7 +22,7 @@ class MedicineCubit extends Cubit<MedicineState> {
         _currentPage = 1;
         _allMedicines = [];
         _hasMorePages = true;
-        emit(MedicineLoading());
+        emit(const MedicineLoading());
       } else if (!_hasMorePages) {
         return; // No more pages to load
       }
@@ -52,28 +52,16 @@ class MedicineCubit extends Cubit<MedicineState> {
     }
   }
 
-  Future<void> getMedicineById(String id) async {
+  Future<void> searchMedicineByName(String query) async {
     try {
-      emit(MedicineLoading());
-      final medicine = await _repository.getMedicineById(id);
-      if (medicine != null) {
-        emit(MedicineDetailLoaded(medicine));
-      } else {
-        emit(const MedicineError('Thuốc không tìm thấy'));
-      }
-    } catch (e) {
-      emit(MedicineError(e.toString()));
-    }
-  }
-
-  Future<void> searchMedicineByName(String name) async {
-    try {
-      emit(MedicineLoading());
-      final medicines = await _repository.searchMedicineByName(name);
-      if (medicines.isEmpty) {
+      emit(const MedicineLoading());
+      final medicine =
+          await _repository.searchMedicineByName(query); // 1 thuốc hoặc null
+      if (medicine == null) {
         emit(const MedicineError('Không tìm thấy thuốc'));
       } else {
-        emit(MedicineListLoaded(medicines, hasMorePages: false));
+        // chuyển sang list 1 phần tử để dùng chung ListView
+        emit(MedicineListLoaded([medicine], hasMorePages: false));
       }
     } catch (e) {
       emit(MedicineError(e.toString()));

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../core/theme/app_colors.dart';
-import '../cubits/chat_cubit.dart';
-import '../widgets/chat_bubble.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../cubits/chat_cubit.dart';
+import '../../widgets/chat_bubble.dart';
 
 class ChatPage extends StatefulWidget {
-  const ChatPage({Key? key}) : super(key: key);
+  const ChatPage({super.key});
 
   @override
   State<ChatPage> createState() => _ChatPageState();
@@ -79,7 +79,7 @@ class _ChatPageState extends State<ChatPage> {
           ),
           Container(
             padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: AppColors.white,
               border: Border(top: BorderSide(color: AppColors.grey200)),
             ),

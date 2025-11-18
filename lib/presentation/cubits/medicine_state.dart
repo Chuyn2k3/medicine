@@ -28,15 +28,6 @@ class MedicineListLoaded extends MedicineState {
   List<Object?> get props => [medicines, hasMorePages];
 }
 
-class MedicineDetailLoaded extends MedicineState {
-  final MedicineModel medicine;
-
-  const MedicineDetailLoaded(this.medicine);
-
-  @override
-  List<Object?> get props => [medicine];
-}
-
 class MedicineError extends MedicineState {
   final String message;
 

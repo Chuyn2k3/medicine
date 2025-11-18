@@ -1,8 +1,12 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:medical_drug/services/token_manager.dart';
+import '../../data/datasources/auth_api_client.dart';
 import '../../data/models/user_model.dart';
 import '../../data/repositories/auth_repository.dart';
+import '../../main.dart';
+import '../pages/login_page.dart';
 
 part 'auth_state.dart';
 
@@ -10,64 +14,75 @@ class AuthCubit extends Cubit<AuthState> {
   final AuthRepository _authRepository;
   final TokenManager _tokenManager;
 
-  AuthCubit(this._authRepository, this._tokenManager) : super(AuthInitial());
+  AuthCubit(this._authRepository, this._tokenManager)
+      : super(const AuthInitial());
+
+  String _normalizePhone(String phone) {
+    phone = phone.replaceAll(' ', '');
+    if (phone.startsWith('0')) return '+84${phone.substring(1)}';
+    if (phone.startsWith('+84')) return phone;
+    if (phone.startsWith('84')) return '+$phone';
+    return phone;
+  }
 
   Future<void> login(String phone, String password) async {
     try {
-      emit(AuthLoading());
-      final response = await _authRepository.login(phone, password);
+      emit(const AuthLoading());
+      final normalizedPhone = _normalizePhone(phone);
+      final response = await _authRepository.login(normalizedPhone, password);
 
-      // Save token
       await _tokenManager.saveToken(response.accessToken);
-
-      // Fetch current user
       final user = await _authRepository.getCurrentUser(response.accessToken);
       await _tokenManager.saveUserId(user.id);
 
       emit(AuthAuthenticated(user));
     } catch (e) {
-      emit(AuthError(e.toString()));
+      final msg = (e as AuthException).message;
+      emit(AuthError(msg));
     }
   }
 
   Future<void> register(String phone, String password) async {
     try {
-      emit(AuthLoading());
-      final user = await _authRepository.register(phone, password);
+      emit(const AuthLoading());
+      final normalizedPhone = _normalizePhone(phone);
+      await _authRepository.register(normalizedPhone, password);
 
-      // Auto-login after registration
-      final loginResponse = await _authRepository.login(phone, password);
-      await _tokenManager.saveToken(loginResponse.accessToken);
-      await _tokenManager.saveUserId(user.id);
-
-      emit(AuthAuthenticated(user));
+      // Chỉ phát state đăng ký thành công, chưa login
+      emit(AuthRegistered(phone: normalizedPhone, password: password));
     } catch (e) {
-      emit(AuthError(e.toString()));
+      final msg = (e as AuthException).message;
+      emit(AuthError(msg));
     }
   }
 
   Future<void> checkAuthStatus() async {
     try {
-      emit(AuthLoading());
+      emit(const AuthLoading());
       final token = await _tokenManager.getToken();
 
       if (token == null || token.isEmpty) {
-        emit(AuthUnauthenticated());
+        emit(const AuthUnauthenticated());
       } else {
         final user = await _authRepository.getCurrentUser(token);
         emit(AuthAuthenticated(user));
       }
     } catch (e) {
-      emit(AuthUnauthenticated());
+      emit(const AuthUnauthenticated());
     }
   }
 
   Future<void> logout() async {
     try {
       await _tokenManager.clear();
-      emit(AuthUnauthenticated());
+      emit(const AuthUnauthenticated());
+      navigatorKey.currentState?.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const LoginPage()),
+        (route) => false,
+      );
     } catch (e) {
-      emit(AuthError(e.toString()));
+      final msg = (e as AuthException).message;
+      emit(AuthError(msg));
     }
   }
 }

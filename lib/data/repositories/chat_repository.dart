@@ -1,5 +1,4 @@
 import '../datasources/api_client.dart';
-import '../mock_data/mock_chat.dart';
 import '../models/chat_message_model.dart';
 import '../models/base_response_model.dart';
 
@@ -15,7 +14,7 @@ class ChatRepository {
           await _apiClient.getChatHistory();
       return response.data ?? [];
     } catch (_) {
-      return mockChatMessages;
+      rethrow;
     }
   }
 
@@ -31,13 +30,13 @@ class ChatRepository {
         isMedicationQuestion: isMedicationQuestion,
       );
       final chatMessage = response.data;
-      if (chatMessage != null) mockChatMessages.add(chatMessage);
+
       return chatMessage;
     } catch (_) {
       final mockResponse = ChatMessageModel(
         reply: 'Xin lỗi, tôi không thể trả lời ngay bây giờ. Vui lòng thử lại!',
       );
-      mockChatMessages.add(mockResponse);
+
       return mockResponse;
     }
   }

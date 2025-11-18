@@ -15,6 +15,16 @@ class AuthLoading extends AuthState {
   const AuthLoading();
 }
 
+class AuthRegistered extends AuthState {
+  final String phone;
+  final String password;
+
+  const AuthRegistered({required this.phone, required this.password});
+
+  @override
+  List<Object?> get props => [phone, password];
+}
+
 class AuthAuthenticated extends AuthState {
   final UserModel user;
 

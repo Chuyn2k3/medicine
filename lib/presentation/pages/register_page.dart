@@ -39,26 +39,43 @@ class _RegisterPageState extends State<RegisterPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Đăng Ký"),
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       body: BlocListener<AuthCubit, AuthState>(
-        listener: (context, state) {
-          if (state is AuthAuthenticated) {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (context) => const HomePage()),
-              (route) => false,
-            );
-          } else if (state is AuthError) {
+        listener: (context, state) async {
+          if (state is AuthRegistered) {
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: AppColors.error,
+              const SnackBar(
+                content: Text("Đăng ký thành công! Đang đăng nhập..."),
+                backgroundColor: AppColors.success,
+                duration: Duration(seconds: 2),
               ),
             );
-          } else if (state is AuthLoading) {
-            setState(() => _isLoading = true);
+
+            // Delay 2s để show Snackbar
+            await Future.delayed(const Duration(seconds: 1));
+
+            // Login tự động
+            await context.read<AuthCubit>().login(state.phone, state.password);
           }
-          if (state is! AuthLoading) {
-            setState(() => _isLoading = false);
-          }
+          // else if (state is AuthError) {
+          //   ScaffoldMessenger.of(context).showSnackBar(
+          //     SnackBar(
+          //       content: Text(state.message),
+          //       backgroundColor: AppColors.error,
+          //     ),
+          //   );
+          // }
+
+          // Cập nhật loading
+          setState(() => _isLoading = state is AuthLoading);
         },
         child: SingleChildScrollView(
           child: Padding(
@@ -66,27 +83,6 @@ class _RegisterPageState extends State<RegisterPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                SizedBox(height: MediaQuery.of(context).size.height * 0.08),
-                Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.person_add,
-                    size: 64,
-                    color: AppColors.primary,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  'Đăng Ký',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.bold,
-                      ),
-                ),
-                const SizedBox(height: 8),
                 Text(
                   'Tạo tài khoản mới để bắt đầu',
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -98,7 +94,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   controller: _phoneController,
                   decoration: InputDecoration(
                     labelText: 'Số điện thoại',
-                    hintText: '+84123456789',
+                    hintText: '0123456789',
                     prefixIcon: const Icon(Icons.phone),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
@@ -158,18 +154,36 @@ class _RegisterPageState extends State<RegisterPage> {
                   onPressed: _isLoading
                       ? null
                       : () {
-                          if (_phoneController.text.isEmpty ||
-                              _passwordController.text.isEmpty ||
-                              _confirmPasswordController.text.isEmpty) {
+                          FocusScope.of(context).unfocus();
+
+                          final phone = _phoneController.text.trim();
+                          final password = _passwordController.text.trim();
+                          final confirmPassword =
+                              _confirmPasswordController.text.trim();
+
+                          final phoneRegex = RegExp(r'^0\d{9}$');
+
+                          if (!phoneRegex.hasMatch(phone)) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text('Vui lòng điền đầy đủ thông tin'),
+                                content: Text(
+                                    'Số điện thoại không hợp lệ (10 số và bắt đầu 0)'),
                               ),
                             );
                             return;
                           }
-                          if (_passwordController.text !=
-                              _confirmPasswordController.text) {
+
+                          if (password.length < 6) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content:
+                                    Text('Mật khẩu phải có ít nhất 6 ký tự'),
+                              ),
+                            );
+                            return;
+                          }
+
+                          if (password != confirmPassword) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('Mật khẩu không trùng khớp'),
@@ -177,10 +191,8 @@ class _RegisterPageState extends State<RegisterPage> {
                             );
                             return;
                           }
-                          context.read<AuthCubit>().register(
-                                _phoneController.text,
-                                _passwordController.text,
-                              );
+
+                          context.read<AuthCubit>().register(phone, password);
                         },
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
@@ -212,8 +224,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const LoginPage(),
-                          ),
+                              builder: (context) => const LoginPage()),
                         );
                       },
                       child: Text(

@@ -1,5 +1,4 @@
 import '../datasources/api_client.dart';
-import '../mock_data/mock_prescriptions.dart';
 import '../models/prescription_model.dart';
 import '../models/base_response_model.dart';
 
@@ -15,7 +14,7 @@ class PrescriptionRepository {
           await _apiClient.getPrescriptionList();
       return response.data ?? [];
     } catch (_) {
-      return mockPrescriptions;
+      rethrow;
     }
   }
 
@@ -26,9 +25,7 @@ class PrescriptionRepository {
           await _apiClient.getPrescriptionById(id);
       return response.data;
     } catch (_) {
-      return mockPrescriptions.firstWhere(
-        (p) => p.id == id,
-      );
+      rethrow;
     }
   }
 }

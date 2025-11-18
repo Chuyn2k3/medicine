@@ -3,6 +3,7 @@ import 'package:get_it/get_it.dart';
 import 'package:medical_drug/data/datasources/auth_api_client.dart';
 import 'package:medical_drug/data/repositories/auth_repository.dart';
 import 'package:medical_drug/presentation/cubits/auth_cubit.dart';
+import 'package:medical_drug/presentation/cubits/medicine_detail_cubit.dart';
 import 'package:medical_drug/services/token_manager.dart';
 
 import '../../data/datasources/api_client.dart';
@@ -13,6 +14,7 @@ import '../../data/repositories/schedule_repository.dart';
 import '../../presentation/cubits/chat_cubit.dart';
 import '../../presentation/cubits/medicine_cubit.dart';
 import '../../presentation/cubits/prescription_cubit.dart';
+import '../../presentation/cubits/prescription_detail_cubit.dart';
 import '../../presentation/cubits/schedule_cubit.dart';
 
 final getIt = GetIt.instance;
@@ -54,8 +56,14 @@ void setupServiceLocator() {
   getIt.registerSingleton<MedicineCubit>(
     MedicineCubit(getIt<MedicineRepository>()),
   );
+  getIt.registerSingleton<MedicineDetailCubit>(
+    MedicineDetailCubit(getIt<MedicineRepository>()),
+  );
   getIt.registerSingleton<PrescriptionCubit>(
     PrescriptionCubit(getIt<PrescriptionRepository>()),
+  );
+  getIt.registerSingleton<PrescriptionDetailCubit>(
+    PrescriptionDetailCubit(getIt<PrescriptionRepository>()),
   );
   getIt.registerSingleton<ScheduleCubit>(
     ScheduleCubit(getIt<ScheduleRepository>()),
