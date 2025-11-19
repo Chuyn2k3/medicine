@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:developer' as developer;
+import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:medical_drug/data/models/medicine_ocr_result.dart';
 import 'package:medical_drug/services/token_manager.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import '../../core/constants/app_constants.dart';
@@ -122,6 +124,34 @@ class ApiClient {
     return BaseResponse.fromJson(
       response.data,
       (json) => MedicineModel.fromJson(json as Map<String, dynamic>),
+    );
+  }
+
+  // ------------------- Medicine OCR APIs -------------------
+  Future<MedicineOcrResult> extractMedicineFromImage(File imageFile) async {
+    final fileName = imageFile.path.split('/').last;
+
+    final formData = FormData.fromMap({
+      'image': await MultipartFile.fromFile(
+        imageFile.path,
+        filename: fileName,
+      ),
+    });
+
+    // Ở đây dùng full URL nên sẽ bỏ qua baseUrl
+    final response = await _dio.post(
+      'https://hydrogenous-captiously-jeanie.ngrok-free.dev/extract_medicine',
+      data: formData,
+      options: Options(
+        sendTimeout: const Duration(seconds: 60),
+        receiveTimeout: const Duration(seconds: 60),
+        contentType: 'multipart/form-data',
+      ),
+    );
+
+    // response.data dạng: { "response": "..." }
+    return MedicineOcrResult.fromJson(
+      Map<String, dynamic>.from(response.data as Map),
     );
   }
 

@@ -48,6 +48,7 @@ dependencies:
   equatable: ^2.0.7
   mqtt5_client: ^4.11.0
   pretty_dio_logger: ^1.4.0
+  image_picker: ^1.1.2
 
 dev_dependencies:
   flutter_test:

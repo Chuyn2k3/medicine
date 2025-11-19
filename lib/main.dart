@@ -4,6 +4,7 @@ import 'package:medical_drug/presentation/cubits/auth_cubit.dart';
 import 'package:medical_drug/presentation/cubits/chat_cubit.dart';
 import 'package:medical_drug/presentation/cubits/medicine_cubit.dart';
 import 'package:medical_drug/presentation/cubits/medicine_detail_cubit.dart';
+import 'package:medical_drug/presentation/cubits/medicine_scan_cubit.dart';
 import 'package:medical_drug/presentation/cubits/prescription_cubit.dart';
 import 'package:medical_drug/presentation/cubits/prescription_detail_cubit.dart';
 import 'package:medical_drug/presentation/cubits/schedule_cubit.dart';
@@ -45,6 +46,9 @@ class MedicineApp extends StatelessWidget {
         ),
         BlocProvider<ChatCubit>(
           create: (context) => getIt<ChatCubit>(),
+        ),
+        BlocProvider<MedicineScanCubit>(
+          create: (context) => getIt<MedicineScanCubit>(),
         ),
       ],
       child: MaterialApp(

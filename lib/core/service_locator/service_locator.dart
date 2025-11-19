@@ -2,8 +2,10 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:medical_drug/data/datasources/auth_api_client.dart';
 import 'package:medical_drug/data/repositories/auth_repository.dart';
+import 'package:medical_drug/data/repositories/medicine_scan_repository.dart';
 import 'package:medical_drug/presentation/cubits/auth_cubit.dart';
 import 'package:medical_drug/presentation/cubits/medicine_detail_cubit.dart';
+import 'package:medical_drug/presentation/cubits/medicine_scan_cubit.dart';
 import 'package:medical_drug/services/token_manager.dart';
 
 import '../../data/datasources/api_client.dart';
@@ -48,7 +50,9 @@ void setupServiceLocator() {
   getIt.registerSingleton<ChatRepository>(
     ChatRepository(getIt<ApiClient>()),
   );
-
+  getIt.registerSingleton<MedicineScanRepository>(
+    MedicineScanRepository(getIt<ApiClient>()),
+  );
   // Cubits
   getIt.registerSingleton<AuthCubit>(
     AuthCubit(getIt<AuthRepository>(), getIt<TokenManager>()),
@@ -70,5 +74,8 @@ void setupServiceLocator() {
   );
   getIt.registerSingleton<ChatCubit>(
     ChatCubit(getIt<ChatRepository>()),
+  );
+  getIt.registerSingleton<MedicineScanCubit>(
+    MedicineScanCubit(getIt<MedicineScanRepository>()),
   );
 }
