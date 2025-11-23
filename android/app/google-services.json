@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "95140069130",
+    "project_id": "medicne-system",
+    "storage_bucket": "medicne-system.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:95140069130:android:ca0b19e39d28b05d2f84f3",
+        "android_client_info": {
+          "package_name": "com.team.medicine"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCHcAX08mmC2Sv4HFVrml4gOu00wWHcimI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

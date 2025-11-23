@@ -1,3 +1,4 @@
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:get_it/get_it.dart';
 import 'package:medical_drug/data/datasources/auth_api_client.dart';
@@ -6,6 +7,7 @@ import 'package:medical_drug/data/repositories/medicine_scan_repository.dart';
 import 'package:medical_drug/presentation/cubits/auth_cubit.dart';
 import 'package:medical_drug/presentation/cubits/medicine_detail_cubit.dart';
 import 'package:medical_drug/presentation/cubits/medicine_scan_cubit.dart';
+import 'package:medical_drug/services/fcm_service.dart';
 import 'package:medical_drug/services/token_manager.dart';
 
 import '../../data/datasources/api_client.dart';
@@ -53,9 +55,13 @@ void setupServiceLocator() {
   getIt.registerSingleton<MedicineScanRepository>(
     MedicineScanRepository(getIt<ApiClient>()),
   );
+  getIt.registerSingleton<FcmService>(
+    FcmService(FirebaseMessaging.instance),
+  );
   // Cubits
   getIt.registerSingleton<AuthCubit>(
-    AuthCubit(getIt<AuthRepository>(), getIt<TokenManager>()),
+    AuthCubit(
+        getIt<AuthRepository>(), getIt<TokenManager>(), getIt<FcmService>()),
   );
   getIt.registerSingleton<MedicineCubit>(
     MedicineCubit(getIt<MedicineRepository>()),

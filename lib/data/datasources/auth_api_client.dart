@@ -28,12 +28,23 @@ class AuthApiClient {
     ));
   }
 
-  Future<LoginResponse> login(String phone, String password) async {
+  Future<LoginResponse> login(
+    String phone,
+    String password, {
+    String? fcmToken,
+  }) async {
     try {
-      final response = await _dio.post('/auth/login', data: {
+      final body = <String, dynamic>{
         'phone': phone,
         'password': password,
-      });
+      };
+      if (fcmToken != null && fcmToken.isNotEmpty) {
+        body['fcmToken'] = fcmToken; // BE đọc trường này
+      }
+      final response = await _dio.post(
+        '/auth/login',
+        data: body,
+      );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         final data = response.data['data'] as Map<String, dynamic>;

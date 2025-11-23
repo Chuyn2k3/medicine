@@ -6,9 +6,13 @@ class AuthRepository {
 
   AuthRepository(this._apiClient);
 
-  Future<LoginResponse> login(String phone, String password) async {
+  Future<LoginResponse> login(
+    String phone,
+    String password, {
+    String? fcmToken,
+  }) async {
     try {
-      return await _apiClient.login(phone, password);
+      return await _apiClient.login(phone, password, fcmToken: fcmToken);
     } catch (e) {
       rethrow;
     }

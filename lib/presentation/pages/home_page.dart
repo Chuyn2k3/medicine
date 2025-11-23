@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:intl/intl.dart';
+import 'package:medical_drug/presentation/pages/wifi_setup_page.dart';
 import '../../core/theme/app_colors.dart';
 import '../cubits/auth_cubit.dart';
 import '../widgets/home_card.dart';
@@ -153,6 +154,25 @@ class _HomePageState extends State<HomePage> {
                     );
                   },
                 ),
+                const SizedBox(height: 12),
+                // Thêm một HomeCard mới vào cuối danh sách
+                HomeCard(
+                  icon: Icons
+                      .settings_remote, // Biểu tượng phù hợp cho điều khiển
+                  title: 'Điều khiển ESP32',
+                  description:
+                      'Quản lý các thiết bị IoT và gửi dữ liệu lên ESP32',
+                  color: AppColors.success, // Màu sắc của card
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) =>
+                                WifiControllerPage() // Trang điều khiển ESP32
+                            ));
+                  },
+                ),
+
                 const SizedBox(height: 12),
               ],
             ),
