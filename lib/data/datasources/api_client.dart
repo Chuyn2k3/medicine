@@ -138,9 +138,8 @@ class ApiClient {
       ),
     });
 
-    // Ở đây dùng full URL nên sẽ bỏ qua baseUrl
     final response = await _dio.post(
-      'https://hydrogenous-captiously-jeanie.ngrok-free.dev/extract_medicine',
+      'https://image-1051573378260.asia-southeast1.run.app/extract',
       data: formData,
       options: Options(
         sendTimeout: const Duration(seconds: 60),
@@ -149,7 +148,7 @@ class ApiClient {
       ),
     );
 
-    // response.data dạng: { "response": "..." }
+    // API mới trả trực tiếp JSON đúng format bạn mô tả
     return MedicineOcrResult.fromJson(
       Map<String, dynamic>.from(response.data as Map),
     );

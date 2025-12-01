@@ -100,7 +100,7 @@ class _PrescriptionScanPageState extends State<PrescriptionScanPage> {
               controller: _searchController,
               onChanged: _onSearchChanged,
               decoration: InputDecoration(
-                hintText: 'Tìm kiếm đơn thuốc hoặc mã QR...',
+                hintText: 'Tìm kiếm đơn thuốc.',
                 prefixIcon: const Icon(Icons.search),
                 suffixIcon: _searchController.text.isNotEmpty
                     ? IconButton(
@@ -119,29 +119,29 @@ class _PrescriptionScanPageState extends State<PrescriptionScanPage> {
               ),
             ),
 
-            const SizedBox(height: 16),
-
-            // Nút quét mã QR
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _openScanner,
-                    icon: const Icon(Icons.qr_code_scanner, size: 28),
-                    label: const Text('Quét Mã QR',
-                        style: TextStyle(fontSize: 16)),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            // const SizedBox(height: 16),
+            //
+            // // Nút quét mã QR
+            // Row(
+            //   children: [
+            //     Expanded(
+            //       child: ElevatedButton.icon(
+            //         onPressed: _openScanner,
+            //         icon: const Icon(Icons.qr_code_scanner, size: 28),
+            //         label: const Text('Quét Mã QR',
+            //             style: TextStyle(fontSize: 16)),
+            //         style: ElevatedButton.styleFrom(
+            //           backgroundColor: AppColors.primary,
+            //           foregroundColor: Colors.white,
+            //           padding: const EdgeInsets.symmetric(vertical: 16),
+            //           shape: RoundedRectangleBorder(
+            //             borderRadius: BorderRadius.circular(12),
+            //           ),
+            //         ),
+            //       ),
+            //     ),
+            //   ],
+            // ),
 
             const SizedBox(height: 20),
 
