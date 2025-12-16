@@ -11,37 +11,70 @@ class _WifiControllerPageState extends State<WifiControllerPage> {
   TextEditingController ssidController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
+  String statusMessage = 'Chưa kết nối';
+  bool isConnecting = false;
+
+  String logSsid = '';
+  String logPassword = '';
+
   void connectToWiFi() async {
-    var ssid = ssidController.text;
-    var password = passwordController.text;
+    final ssid = ssidController.text;
+    final password = passwordController.text;
 
-    // Địa chỉ IP của ESP32 (của AP ESP32)
-    var url = Uri.parse("http://192.168.4.1/wifi");
+    setState(() {
+      isConnecting = true;
+      statusMessage = 'Đang kết nối...';
+      logSsid = ssid;
+      logPassword = password;
+    });
 
-    // Tạo JSON payload
-    var jsonData = jsonEncode({
+    // Show snackbar khi bấm connect
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Đang gửi thông tin Wi-Fi tới ESP32...')),
+    );
+
+    final url = Uri.parse("http://192.168.4.1/wifi");
+
+    final jsonData = jsonEncode({
       'ssid': ssid,
       'pass': password,
     });
 
     try {
-      // Gửi POST request
-      var response = await http.post(
+      final response = await http.post(
         url,
         headers: {"Content-Type": "application/json"},
         body: jsonData,
       );
 
       if (response.statusCode == 200) {
-        // Kết nối thành công
-        print("Kết nối Wi-Fi thành công!");
-        print(response.body);
+        setState(() {
+          statusMessage = '✅ Kết nối Wi-Fi thành công';
+          isConnecting = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Kết nối Wi-Fi thành công!')),
+        );
       } else {
-        // Lỗi khi kết nối
-        print("Không thể kết nối! Lỗi: ${response.body}");
+        setState(() {
+          statusMessage = '❌ Lỗi kết nối: ${response.statusCode}';
+          isConnecting = false;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Không thể kết nối Wi-Fi')),
+        );
       }
     } catch (e) {
-      print("Lỗi: $e");
+      setState(() {
+        statusMessage = '❌ Lỗi: $e';
+        isConnecting = false;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Lỗi kết nối ESP32')),
+      );
     }
   }
 
@@ -54,6 +87,7 @@ class _WifiControllerPageState extends State<WifiControllerPage> {
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
               controller: ssidController,
@@ -65,10 +99,48 @@ class _WifiControllerPageState extends State<WifiControllerPage> {
               decoration: InputDecoration(labelText: 'Mật khẩu Wi-Fi'),
             ),
             SizedBox(height: 20),
+
             ElevatedButton(
-              onPressed: connectToWiFi,
-              child: Text('Kết nối Wi-Fi'),
+              onPressed: isConnecting ? null : connectToWiFi,
+              child: isConnecting
+                  ? SizedBox(
+                      height: 20,
+                      width: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
+                  : Text('Kết nối Wi-Fi'),
             ),
+
+            SizedBox(height: 30),
+
+            // ===== TRẠNG THÁI =====
+            Text(
+              'Trạng thái:',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Text(
+              statusMessage,
+              style: TextStyle(
+                color: statusMessage.contains('thành công')
+                    ? Colors.green
+                    : statusMessage.contains('Lỗi')
+                        ? Colors.red
+                        : Colors.black,
+              ),
+            ),
+
+            Divider(height: 30),
+
+            // ===== LOG NGƯỜI DÙNG NHẬP =====
+            Text(
+              'Log thông tin đã nhập:',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            Text('SSID: $logSsid'),
+            Text('Password: $logPassword'),
           ],
         ),
       ),
